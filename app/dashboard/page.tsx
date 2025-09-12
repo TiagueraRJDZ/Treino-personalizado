@@ -1,33 +1,42 @@
 export default function DashboardPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+    <div>
+      <h1>Dashboard</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Card de Próximos Treinos */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Próximos Treinos</h2>
-          <div className="space-y-3">
-            {/* Implementar lista de próximos treinos */}
-          </div>
+      <div className="grid">
+        <div className="card">
+          <h2>Total de Alunos</h2>
+          <p>15</p>
         </div>
-
-        {/* Card de Progresso */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Progresso</h2>
-          <div className="space-y-3">
-            {/* Implementar gráficos de progresso */}
-          </div>
+        
+        <div className="card">
+          <h2>Treinos Ativos</h2>
+          <p>8</p>
         </div>
+        
+        <div className="card">
+          <h2>Exercícios Cadastrados</h2>
+          <p>42</p>
+        </div>
+      </div>
 
-        {/* Card de Estatísticas */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Estatísticas</h2>
-          <div className="space-y-3">
-            {/* Implementar estatísticas gerais */}
+      <h2>Próximos Treinos</h2>
+      <div className="card">
+        <div className="space-y-4">
+          <div>
+            <p><strong>João Silva</strong> - 14:00</p>
+            <p>Treino de Força</p>
+          </div>
+          <div>
+            <p><strong>Maria Santos</strong> - 15:30</p>
+            <p>Treino Funcional</p>
+          </div>
+          <div>
+            <p><strong>Pedro Costa</strong> - 17:00</p>
+            <p>Treino de Hipertrofia</p>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
