@@ -1,16 +1,43 @@
+'use client';
+
 import type { Metadata } from 'next';
 import Link from 'next/link';
-
-export const metadata: Metadata = {
-  title: 'Dashboard - Treino Personalizado',
-  description: 'Sistema de gerenciamento de treinos personalizados',
-};
+import { useAuth } from '../contexts/AuthContext';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { isAuthenticated, userEmail, logout, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="loading-spinner">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="4" strokeDasharray="40" strokeDashoffset="40">
+              <animate attributeName="stroke-dashoffset" dur="1s" repeatCount="indefinite" values="40;0"/>
+            </circle>
+          </svg>
+        </div>
+        <p>Carregando...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
   return (
     <div className="dashboard-app">
       <aside className="dashboard-sidebar">
@@ -100,12 +127,23 @@ export default function DashboardLayout({
         <div className="sidebar-footer">
           <div className="user-info">
             <div className="user-avatar">
-              <span>JP</span>
+              <span>{userEmail ? userEmail.charAt(0).toUpperCase() : 'U'}</span>
             </div>
             <div className="user-details">
-              <div className="user-name">João Personal</div>
+              <div className="user-name">{userEmail || 'Usuário'}</div>
               <div className="user-role">Personal Trainer</div>
             </div>
+            <button 
+              onClick={logout}
+              className="logout-btn"
+              title="Sair"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16,17 21,12 16,7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </button>
           </div>
         </div>
       </aside>

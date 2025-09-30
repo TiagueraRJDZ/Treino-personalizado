@@ -56,14 +56,13 @@ export default function HomePage() {
               </div>
 
               <div className="hero-actions">
-                <Link href="/dashboard" className="btn btn-primary">
+                <Link href="/login" className="btn btn-primary">
                   <svg className="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="3" width="7" height="7"/>
-                    <rect x="14" y="3" width="7" height="7"/>
-                    <rect x="14" y="14" width="7" height="7"/>
-                    <rect x="3" y="14" width="7" height="7"/>
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                    <polyline points="10,17 15,12 10,7"/>
+                    <line x1="15" y1="12" x2="3" y2="12"/>
                   </svg>
-                  Acessar Dashboard
+                  Fazer Login
                 </Link>
                 <Link href="/auth" className="btn btn-secondary">
                   <svg className="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -166,13 +165,13 @@ export default function HomePage() {
                 <h3>Já tem uma conta?</h3>
                 <p>Entre rapidamente para acessar seus treinos</p>
               </div>
-              <form className="quick-login-form">
+              <form className="quick-login-form" action="/login" method="get">
                 <div className="form-group-inline">
-                  <input type="email" placeholder="seu@email.com" className="quick-input" />
-                  <input type="password" placeholder="Sua senha" className="quick-input" />
-                  <button type="submit" className="btn btn-primary">
+                  <input type="email" placeholder="seu@email.com" className="quick-input" name="email" />
+                  <input type="password" placeholder="Sua senha" className="quick-input" name="password" />
+                  <Link href="/login" className="btn btn-primary">
                     Entrar
-                  </button>
+                  </Link>
                 </div>
               </form>
               <div className="login-links">
