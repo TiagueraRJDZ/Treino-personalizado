@@ -1312,7 +1312,7 @@ body {
   padding: 2.5rem;
   border-radius: 16px;
   box-shadow: var(--shadow-xl);
-  max-width: 600px;
+  max-width: 700px;
   width: 100%;
 }
 
@@ -1337,10 +1337,10 @@ body {
 }
 
 .form-group-inline {
-  display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  display: flex;
   gap: 1rem;
-  align-items: center;
+  align-items: stretch;
+  flex-wrap: wrap;
 }
 
 .quick-input {
@@ -1349,12 +1349,21 @@ body {
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.2s ease;
+  flex: 1;
+  min-width: 200px;
 }
 
 .quick-input:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group-inline .btn {
+  flex-shrink: 0;
+  min-width: 120px;
+  height: auto;
+  align-self: stretch;
 }
 
 .login-links {
@@ -1522,6 +1531,59 @@ body {
   padding: 0 2rem;
 }
 
+/* Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  justify-content: center;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #fff, #f8f9fa);
+  color: var(--color-primary);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #ffffff, #ffffff);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.btn-full {
+  width: 100%;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .hero-content {
@@ -1537,6 +1599,24 @@ body {
   .dashboard-preview {
     transform: none;
     max-width: 400px;
+  }
+}
+
+@media (max-width: 900px) {
+  .form-group-inline {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 1rem;
+  }
+  
+  .form-group-inline .btn {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
+  
+  .quick-input {
+    min-width: unset;
   }
 }
 
@@ -1560,7 +1640,19 @@ body {
   }
   
   .form-group-inline {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .quick-input {
+    min-width: unset;
+    width: 100%;
+  }
+  
+  .form-group-inline .btn {
+    min-width: unset;
+    width: 100%;
+    margin-top: 0.5rem;
   }
   
   .footer-content {
