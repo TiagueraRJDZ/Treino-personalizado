@@ -523,22 +523,26 @@ body {
 .quick-actions {
   padding: 1.5rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  flex-direction: row;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .action-btn {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid;
   border-radius: var(--radius);
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   text-decoration: none;
+  flex: 1;
+  min-width: 140px;
 }
 
 .action-btn.primary {
@@ -569,6 +573,21 @@ body {
 
 .action-btn.tertiary:hover {
   background-color: var(--color-gray-200);
+}
+
+.action-btn svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* Quick Actions Card - positioned above dashboard */
+.quick-actions-card {
+  margin: 1.5rem 0;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-gray-200);
 }
 
 /* Login Card */
