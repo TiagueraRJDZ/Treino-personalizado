@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useEstatisticas } from '@/hooks/useFirestore';
 import { useProximosTreinos, useAtividadesRecentes } from '@/hooks/useProximosTreinos';
 import { LoadingCard, ErrorCard } from '@/app/components/ui/Loading';
-import { criarDadosExemplo } from '@/utils/dadosExemplo';
+import { NovoAlunoModal } from '@/app/components/modals/NovoAlunoModal';
+import { AgendarTreinoModal } from '@/app/components/modals/AgendarTreinoModal';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -12,13 +14,16 @@ export default function DashboardPage() {
   const { proximosTreinos, loading: treinosLoading, error: treinosError } = useProximosTreinos();
   const { atividades, loading: atividadesLoading, error: atividadesError } = useAtividadesRecentes();
 
+  // Estados dos modais
+  const [novoAlunoModalOpen, setNovoAlunoModalOpen] = useState(false);
+  const [agendarTreinoModalOpen, setAgendarTreinoModalOpen] = useState(false);
+
   const handleNovoAluno = () => {
-    router.push('/dashboard/alunos');
+    setNovoAlunoModalOpen(true);
   };
 
   const handleAgendarTreino = () => {
-    // Por enquanto, vamos redirecionar para exercícios como placeholder
-    router.push('/dashboard/exercicios');
+    setAgendarTreinoModalOpen(true);
   };
 
   const handleGerarRelatorio = () => {
@@ -30,14 +35,6 @@ export default function DashboardPage() {
     router.push('/dashboard/exercicios');
   };
 
-  const handleCriarDadosExemplo = async () => {
-    const sucesso = await criarDadosExemplo();
-    if (sucesso) {
-      alert('Dados de exemplo criados com sucesso!');
-    } else {
-      alert('Erro ao criar dados de exemplo. Verifique o console.');
-    }
-  };
   return (
     <div className="dashboard-page">
       <div className="page-header">
@@ -136,12 +133,6 @@ export default function DashboardPage() {
               <polyline points="14,2 14,8 20,8"/>
             </svg>
             <span>Gerar Relatório</span>
-          </button>
-          <button className="action-btn primary" onClick={handleCriarDadosExemplo} style={{background: '#10b981'}}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 6L9 17l-5-5"/>
-            </svg>
-            <span>Criar Dados Teste</span>
           </button>
         </div>
       </div>
@@ -282,6 +273,25 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Modais */}
+      <NovoAlunoModal
+        isOpen={novoAlunoModalOpen}
+        onClose={() => setNovoAlunoModalOpen(false)}
+        onSuccess={() => {
+          // Recarregar dados após sucesso (opcional)
+          window.location.reload();
+        }}
+      />
+
+      <AgendarTreinoModal
+        isOpen={agendarTreinoModalOpen}
+        onClose={() => setAgendarTreinoModalOpen(false)}
+        onSuccess={() => {
+          // Recarregar dados após sucesso (opcional)
+          window.location.reload();
+        }}
+      />
     </div>
   );
 }
