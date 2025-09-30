@@ -11,14 +11,14 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, userEmail, logout, loading } = useAuth();
+  const { user, logout, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
+    if (!loading && !user) {
       router.push('/login');
     }
-  }, [isAuthenticated, loading, router]);
+  }, [user, loading, router]);
 
   if (loading) {
     return (
@@ -35,7 +35,7 @@ export default function DashboardLayout({
     );
   }
 
-  if (!isAuthenticated) {
+  if (!user) {
     return null;
   }
   return (
@@ -127,10 +127,10 @@ export default function DashboardLayout({
         <div className="sidebar-footer">
           <div className="user-info">
             <div className="user-avatar">
-              <span>{userEmail ? userEmail.charAt(0).toUpperCase() : 'U'}</span>
+              <span>{user?.email ? user.email.charAt(0).toUpperCase() : 'U'}</span>
             </div>
             <div className="user-details">
-              <div className="user-name">{userEmail || 'Usuário'}</div>
+              <div className="user-name">{user?.displayName || user?.email || 'Usuário'}</div>
               <div className="user-role">Personal Trainer</div>
             </div>
             <button 

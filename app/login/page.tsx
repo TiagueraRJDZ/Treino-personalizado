@@ -13,7 +13,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { login } = useAuth();
+  const { signIn } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -24,22 +24,31 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.email || !formData.password) {
+      setError('Por favor, preencha todos os campos');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     try {
-      // Simulação de login - substituir por API real
-      if (formData.email === 'admin@treino.com' && formData.password === '123456') {
-        // Usar o método login do contexto
-        login(formData.email, 'authenticated-user-token');
-        
-        // Redirecionar para dashboard
-        router.push('/dashboard');
-      } else {
+      await signIn(formData.email, formData.password);
+      router.push('/dashboard');
+    } catch (error: any) {
+      console.error('Erro no login:', error);
+      if (error.code === 'auth/user-not-found') {
+        setError('Usuário não encontrado');
+      } else if (error.code === 'auth/wrong-password') {
+        setError('Senha incorreta');
+      } else if (error.code === 'auth/invalid-email') {
+        setError('Email inválido');
+      } else if (error.code === 'auth/invalid-credential') {
         setError('Email ou senha incorretos');
+      } else {
+        setError('Erro ao fazer login. Tente novamente.');
       }
-    } catch (err) {
-      setError('Erro no servidor. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -189,13 +198,6 @@ export default function LoginPage() {
                   Criar conta grátis
                 </Link>
               </p>
-            </div>
-
-            {/* Demo credentials */}
-            <div className="demo-credentials">
-              <h4>🚀 Credenciais de demonstração:</h4>
-              <p><strong>Email:</strong> admin@treino.com</p>
-              <p><strong>Senha:</strong> 123456</p>
             </div>
           </div>
         </div>
