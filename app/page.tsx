@@ -3,45 +3,61 @@ import React from 'react';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1 flex flex-col md:flex-row">
-        {/* Seção de Apresentação */}
-        <div className="flex-1 flex flex-col justify-center px-8 py-12 bg-blue-600 text-white">
-          <div className="max-w-xl mx-auto">
-            <h1 className="text-4xl font-bold mb-6">
+    <div className="home">
+      <main className="home__main">
+        <div className="home__hero">
+          <div className="home__hero-content">
+            <h1 className="home__title">
               Treino Personalizado
             </h1>
-            <p className="text-xl mb-8">
-              Gerencie seus alunos, crie treinos personalizados e acompanhe o progresso.
+            <p className="home__subtitle">
+              Transforme sua forma de gerenciar treinos com uma plataforma completa e intuitiva
             </p>
-            <ul className="space-y-4 mb-8">
-              <li className="flex items-center">
-                <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <div className="home__cta">
+              <Link href="/dashboard" className="button button--primary">
+                Acessar Dashboard
+              </Link>
+              <Link href="/auth" className="button button--secondary">
+                Criar Conta
+              </Link>
+            </div>
+            <ul className="feature-list">
+              <li className="feature-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
-                Planejamento de treinos
+                <span>Planejamento inteligente de treinos</span>
               </li>
-              <li className="flex items-center">
-                <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <li className="feature-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>Acompanhamento detalhado de progresso</span>
+              </li>
+              <li className="feature-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Acompanhamento de progresso
+                <span>Avaliações físicas</span>
+              </li>
+              <li className="feature-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Relatórios detalhados</span>
               </li>
             </ul>
           </div>
         </div>
 
         {/* Seção de Login */}
-        <div className="flex-1 flex items-center justify-center px-8 py-12 bg-white">
-          <div className="w-full max-w-md">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900">Bem-vindo(a)</h2>
-              <p className="mt-2 text-gray-600">Acesse sua conta para continuar</p>
+        <div className="home__login">
+          <div className="login-card">
+            <div className="login-card__header">
+              <h2 className="login-card__title">Bem-vindo(a)</h2>
+              <p className="login-card__subtitle">Acesse sua conta para continuar</p>
             </div>
-            <Link 
-              href="/dashboard" 
-              className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
-            >
+            <Link href="/dashboard" className="button button--primary button--full">
               Acessar Dashboard
             </Link>
           </div>
