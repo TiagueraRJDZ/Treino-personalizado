@@ -1,4 +1,43 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useEstatisticas } from '@/hooks/useFirestore';
+import { useProximosTreinos, useAtividadesRecentes } from '@/hooks/useProximosTreinos';
+import { LoadingCard, ErrorCard } from '@/app/components/ui/Loading';
+import { criarDadosExemplo } from '@/utils/dadosExemplo';
+
 export default function DashboardPage() {
+  const router = useRouter();
+  const { stats, loading: statsLoading, error: statsError } = useEstatisticas();
+  const { proximosTreinos, loading: treinosLoading, error: treinosError } = useProximosTreinos();
+  const { atividades, loading: atividadesLoading, error: atividadesError } = useAtividadesRecentes();
+
+  const handleNovoAluno = () => {
+    router.push('/dashboard/alunos');
+  };
+
+  const handleAgendarTreino = () => {
+    // Por enquanto, vamos redirecionar para exercícios como placeholder
+    router.push('/dashboard/exercicios');
+  };
+
+  const handleGerarRelatorio = () => {
+    // Por enquanto, vamos mostrar um alert como placeholder
+    alert('Funcionalidade de relatórios será implementada em breve!');
+  };
+
+  const handleVerTodosTreinos = () => {
+    router.push('/dashboard/exercicios');
+  };
+
+  const handleCriarDadosExemplo = async () => {
+    const sucesso = await criarDadosExemplo();
+    if (sucesso) {
+      alert('Dados de exemplo criados com sucesso!');
+    } else {
+      alert('Erro ao criar dados de exemplo. Verifique o console.');
+    }
+  };
   return (
     <div className="dashboard-page">
       <div className="page-header">
@@ -15,7 +54,9 @@ export default function DashboardPage() {
             </svg>
           </div>
           <div className="stat-content">
-            <div className="stat-number">42</div>
+            <div className="stat-number">
+              {statsLoading ? '...' : statsError ? 'Erro' : stats.alunosAtivos}
+            </div>
             <div className="stat-label">Alunos Ativos</div>
           </div>
         </div>
@@ -27,7 +68,9 @@ export default function DashboardPage() {
             </svg>
           </div>
           <div className="stat-content">
-            <div className="stat-number">156</div>
+            <div className="stat-number">
+              {statsLoading ? '...' : statsError ? 'Erro' : stats.treinosConcluidos}
+            </div>
             <div className="stat-label">Treinos Concluídos</div>
           </div>
         </div>
@@ -42,7 +85,9 @@ export default function DashboardPage() {
             </svg>
           </div>
           <div className="stat-content">
-            <div className="stat-number">8</div>
+            <div className="stat-number">
+              {statsLoading ? '...' : statsError ? 'Erro' : stats.treinosHoje}
+            </div>
             <div className="stat-label">Treinos Hoje</div>
           </div>
         </div>
@@ -54,7 +99,9 @@ export default function DashboardPage() {
             </svg>
           </div>
           <div className="stat-content">
-            <div className="stat-number">92%</div>
+            <div className="stat-number">
+              {statsLoading ? '...' : statsError ? 'Erro' : `${stats.taxaAdesao}%`}
+            </div>
             <div className="stat-label">Taxa de Adesão</div>
           </div>
         </div>
@@ -66,7 +113,7 @@ export default function DashboardPage() {
           <h3 className="card-title">Ações Rápidas</h3>
         </div>
         <div className="quick-actions">
-          <button className="action-btn primary">
+          <button className="action-btn primary" onClick={handleNovoAluno}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10"/>
               <line x1="12" y1="8" x2="12" y2="16"/>
@@ -74,7 +121,7 @@ export default function DashboardPage() {
             </svg>
             <span>Novo Aluno</span>
           </button>
-          <button className="action-btn secondary">
+          <button className="action-btn secondary" onClick={handleAgendarTreino}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
               <line x1="16" y1="2" x2="16" y2="6"/>
@@ -83,12 +130,18 @@ export default function DashboardPage() {
             </svg>
             <span>Agendar Treino</span>
           </button>
-          <button className="action-btn tertiary">
+          <button className="action-btn tertiary" onClick={handleGerarRelatorio}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14,2 14,8 20,8"/>
             </svg>
             <span>Gerar Relatório</span>
+          </button>
+          <button className="action-btn primary" onClick={handleCriarDadosExemplo} style={{background: '#10b981'}}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            <span>Criar Dados Teste</span>
           </button>
         </div>
       </div>
@@ -97,41 +150,50 @@ export default function DashboardPage() {
         <div className="dashboard-card">
           <div className="card-header">
             <h3 className="card-title">Próximos Treinos</h3>
-            <button className="card-action">Ver todos</button>
+            <button className="card-action" onClick={handleVerTodosTreinos}>Ver todos</button>
           </div>
           <div className="workout-list">
-            <div className="workout-item">
-              <div className="workout-time">09:00</div>
-              <div className="workout-details">
-                <div className="workout-client">Maria Silva</div>
-                <div className="workout-type">Treino de Força</div>
+            {treinosLoading ? (
+              <LoadingCard title="Carregando treinos..." />
+            ) : treinosError ? (
+              <ErrorCard title="Erro ao carregar treinos" message={treinosError} />
+            ) : proximosTreinos.length === 0 ? (
+              <div className="p-4 text-center text-gray-500">
+                <div className="flex flex-col items-center gap-2">
+                  <svg className="w-8 h-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  <div>Nenhum treino agendado</div>
+                </div>
               </div>
-              <div className="workout-status ongoing">Em andamento</div>
-            </div>
-            <div className="workout-item">
-              <div className="workout-time">10:30</div>
-              <div className="workout-details">
-                <div className="workout-client">João Santos</div>
-                <div className="workout-type">Cardio + Funcional</div>
-              </div>
-              <div className="workout-status scheduled">Agendado</div>
-            </div>
-            <div className="workout-item">
-              <div className="workout-time">14:00</div>
-              <div className="workout-details">
-                <div className="workout-client">Ana Costa</div>
-                <div className="workout-type">Pilates</div>
-              </div>
-              <div className="workout-status scheduled">Agendado</div>
-            </div>
-            <div className="workout-item">
-              <div className="workout-time">16:30</div>
-              <div className="workout-details">
-                <div className="workout-client">Carlos Pereira</div>
-                <div className="workout-type">Hipertrofia</div>
-              </div>
-              <div className="workout-status scheduled">Agendado</div>
-            </div>
+            ) : (
+              proximosTreinos.slice(0, 4).map((treino) => (
+                <div key={treino.id} className="workout-item">
+                  <div className="workout-time">
+                    {treino.data.toLocaleTimeString('pt-BR', { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </div>
+                  <div className="workout-details">
+                    <div className="workout-client">
+                      {treino.aluno?.nome || 'Aluno não encontrado'}
+                    </div>
+                    <div className="workout-type">
+                      {treino.observacoes || 'Treino personalizado'}
+                    </div>
+                  </div>
+                  <div className={`workout-status ${treino.status === 'agendado' ? 'scheduled' : 'ongoing'}`}>
+                    {treino.status === 'agendado' ? 'Agendado' : 
+                     treino.status === 'em-andamento' ? 'Em andamento' : 
+                     treino.status}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -140,41 +202,54 @@ export default function DashboardPage() {
             <h3 className="card-title">Atividade Recente</h3>
           </div>
           <div className="activity-list">
-            <div className="activity-item">
-              <div className="activity-icon completed">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="20,6 9,17 4,12"/>
-                </svg>
+            {atividadesLoading ? (
+              <LoadingCard title="Carregando atividades..." />
+            ) : atividadesError ? (
+              <ErrorCard title="Erro ao carregar atividades" message={atividadesError} />
+            ) : atividades.length === 0 ? (
+              <div className="p-4 text-center text-gray-500">
+                <div className="flex flex-col items-center gap-2">
+                  <svg className="w-8 h-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="6" x2="12" y2="12"/>
+                    <line x1="16.24" y1="16.24" x2="12" y2="12"/>
+                  </svg>
+                  <div>Nenhuma atividade recente</div>
+                </div>
               </div>
-              <div className="activity-content">
-                <div className="activity-title">Treino concluído por Maria Silva</div>
-                <div className="activity-time">Há 15 minutos</div>
-              </div>
-            </div>
-            <div className="activity-item">
-              <div className="activity-icon new">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-              </div>
-              <div className="activity-content">
-                <div className="activity-title">Novo aluno cadastrado: Pedro Oliveira</div>
-                <div className="activity-time">Há 2 horas</div>
-              </div>
-            </div>
-            <div className="activity-item">
-              <div className="activity-icon update">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14,2 14,8 20,8"/>
-                </svg>
-              </div>
-              <div className="activity-content">
-                <div className="activity-title">Plano de treino atualizado para Ana Costa</div>
-                <div className="activity-time">Há 4 horas</div>
-              </div>
-            </div>
+            ) : (
+              atividades.slice(0, 3).map((atividade) => {
+                const tempoDecorrido = new Date().getTime() - atividade.data.getTime();
+                const minutosDecorridos = Math.floor(tempoDecorrido / (1000 * 60));
+                const horasDecorridas = Math.floor(minutosDecorridos / 60);
+                const diasDecorridos = Math.floor(horasDecorridas / 24);
+                
+                let tempoTexto = '';
+                if (diasDecorridos > 0) {
+                  tempoTexto = `Há ${diasDecorridos} dia${diasDecorridos > 1 ? 's' : ''}`;
+                } else if (horasDecorridas > 0) {
+                  tempoTexto = `Há ${horasDecorridas} hora${horasDecorridas > 1 ? 's' : ''}`;
+                } else if (minutosDecorridos > 0) {
+                  tempoTexto = `Há ${minutosDecorridos} minuto${minutosDecorridos > 1 ? 's' : ''}`;
+                } else {
+                  tempoTexto = 'Agora mesmo';
+                }
+
+                return (
+                  <div key={atividade.id} className="activity-item">
+                    <div className="activity-icon completed">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="20,6 9,17 4,12"/>
+                      </svg>
+                    </div>
+                    <div className="activity-content">
+                      <div className="activity-title">{atividade.titulo}</div>
+                      <div className="activity-time">{tempoTexto}</div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 

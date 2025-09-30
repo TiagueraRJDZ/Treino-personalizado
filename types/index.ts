@@ -45,7 +45,7 @@ export interface Treino {
   data: Date;
   exercicios: ExercicioTreino[];
   observacoes?: string;
-  status: 'agendado' | 'concluido' | 'cancelado';
+  status: 'agendado' | 'em-andamento' | 'concluido' | 'cancelado';
 }
 
 export interface ExercicioTreino {
