@@ -727,6 +727,21 @@ body {
   gap: 1.5rem;
 }
 
+/* Espaçamento específico dos checkboxes na página de cadastro */
+.auth-form .checkbox-label {
+  align-items: flex-start;
+}
+
+.auth-form .checkbox-label input[type="checkbox"] {
+  margin-right: 1.25rem !important; /* distância clara entre a caixa e o texto */
+  margin-top: 0.2rem;
+}
+
+/* Reduz o espaçamento entre frases quando há dois checkbox-group seguidos */
+.auth-form .checkbox-group + .checkbox-group {
+  margin-top: -1rem; /* reduz o gap de 1.5rem para ~0.5rem apenas entre as duas frases */
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -779,18 +794,24 @@ body {
 .checkbox-label {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
   cursor: pointer;
   font-size: 0.875rem;
   color: var(--color-gray-600);
   line-height: 1.5;
+  gap: 1rem; /* espaçamento confortável entre a caixa e o texto */
 }
 
 .checkbox-label input[type="checkbox"] {
   width: 1rem;
   height: 1rem;
   margin: 0;
+  margin-top: 0.125rem;
   accent-color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.checkbox-label .checkmark {
+  display: none;
 }
 
 .link {
@@ -809,7 +830,7 @@ body {
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-  background-color: var(--color-primary);
+  background-color: #374151;
   color: white;
   border: none;
   padding: 1rem;
@@ -822,7 +843,7 @@ body {
 }
 
 .auth-submit-btn:hover {
-  background-color: var(--color-primary-dark);
+  background-color: #4B5563;
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
@@ -913,12 +934,12 @@ body {
     gap: 4rem;
     max-width: 1200px;
     margin: 0 auto;
-    align-items: center;
+    align-items: start; /* alinha os blocos ao topo */
   }
 
   .auth-benefits {
     display: block;
-    padding: 2rem;
+    padding: 2.5rem; /* harmoniza com o padding do auth-card */
   }
 
   .auth-benefits h3 {
@@ -1922,7 +1943,7 @@ body {
   margin-bottom: 2rem;
 }
 
-.checkbox-label {
+.form-options .checkbox-label {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1931,7 +1952,7 @@ body {
   color: var(--color-gray-700);
 }
 
-.checkbox-label input[type="checkbox"] {
+.form-options .checkbox-label input[type="checkbox"] {
   width: auto;
   margin: 0;
 }
