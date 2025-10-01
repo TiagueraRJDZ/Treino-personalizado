@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { 
   User, 
   signInWithEmailAndPassword, 
@@ -32,6 +33,8 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -41,6 +44,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return unsubscribe;
   }, []);
+
+  // Detecta navegação pelo botão "voltar" e desloga automaticamente
+  useEffect(() => {
+    if (!user) return;
+
+    const handlePopState = async (event: PopStateEvent) => {
+      // Se o usuário está logado e usou o botão voltar
+      if (user && (pathname === '/dashboard' || pathname?.startsWith('/dashboard/'))) {
+        try {
+          await signOut(auth);
+          // Redireciona para a página inicial
+          router.replace('/');
+        } catch (error) {
+          console.error('Erro ao fazer logout automático:', error);
+        }
+      }
+    };
+
+    const handleBeforeUnload = () => {
+      // Desloga quando o usuário sai da página/fecha o navegador
+      if (user && (pathname === '/dashboard' || pathname?.startsWith('/dashboard/'))) {
+        signOut(auth);
+      }
+    };
+
+    // Adiciona os listeners
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Remove os listeners quando o componente é desmontado
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [user, pathname, router]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -63,6 +101,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
+      // Limpa dados salvos do "Lembrar de mim"
+      localStorage.removeItem('rememberedEmail');
+      localStorage.removeItem('rememberedPassword');
+      
+      // Limpa session storage
+      sessionStorage.clear();
+      
       await signOut(auth);
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
