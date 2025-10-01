@@ -1569,7 +1569,7 @@ body {
 
 .btn-primary {
   background: linear-gradient(135deg, #fff, #f8f9fa);
-  color: var(--color-primary);
+  color: var(--color-primary) !important;
   border: 2px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
@@ -1578,6 +1578,12 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   background: linear-gradient(135deg, #ffffff, #ffffff);
+}
+
+/* Específico para a seção de login - garante visibilidade do botão */
+.login-section .btn-primary {
+  color: var(--color-primary) !important;
+  font-weight: 600;
 }
 
 .btn-secondary {
@@ -1943,10 +1949,10 @@ body {
 
 .login-button {
   width: 100%;
-  background: linear-gradient(135deg, var(--color-primary), #667eea);
-  color: white;
-  border: none;
-  padding: 1rem 1.5rem;
+  background: white;
+  color: var(--color-gray-900);
+  border: 2px solid var(--color-gray-200);
+  padding: 0.875rem 1rem;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
@@ -1959,8 +1965,8 @@ body {
 }
 
 .login-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .login-button:disabled {

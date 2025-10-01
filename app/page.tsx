@@ -56,7 +56,7 @@ export default function HomePage() {
               </div>
 
               <div className="hero-actions">
-                <Link href="/login" className="btn btn-primary">
+                <Link href="/login" className="btn btn-secondary">
                   <svg className="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                     <polyline points="10,17 15,12 10,7"/>
