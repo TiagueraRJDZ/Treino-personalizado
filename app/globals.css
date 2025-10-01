@@ -1949,9 +1949,9 @@ body {
 
 .login-button {
   width: 100%;
-  background: white;
-  color: var(--color-gray-900);
-  border: 2px solid var(--color-gray-200);
+  background: #374151;
+  color: white;
+  border: 2px solid #374151;
   padding: 0.875rem 1rem;
   border-radius: 8px;
   font-size: 1rem;
@@ -1965,8 +1965,9 @@ body {
 }
 
 .login-button:hover:not(:disabled) {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #4B5563;
+  border-color: #4B5563;
+  transform: translateY(-1px);
 }
 
 .login-button:disabled {
