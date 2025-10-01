@@ -312,6 +312,13 @@ body {
   font-weight: 700;
   margin: 0;
   line-height: 1;
+  text-shadow: 
+    -1px -1px 0 rgba(0, 0, 0, 0.1),
+    1px -1px 0 rgba(0, 0, 0, 0.1),
+    -1px 1px 0 rgba(0, 0, 0, 0.1),
+    1px 1px 0 rgba(0, 0, 0, 0.1),
+    0 0 4px rgba(0, 0, 0, 0.1);
+  -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.1);
 }
 
 .stat-label {
@@ -1244,6 +1251,13 @@ body {
   font-weight: 800;
   color: #ffd93d;
   line-height: 1;
+  text-shadow: 
+    -1px -1px 0 rgba(0, 0, 0, 0.2),
+    1px -1px 0 rgba(0, 0, 0, 0.2),
+    -1px 1px 0 rgba(0, 0, 0, 0.2),
+    1px 1px 0 rgba(0, 0, 0, 0.2),
+    0 0 6px rgba(0, 0, 0, 0.3);
+  -webkit-text-stroke: 0.8px rgba(0, 0, 0, 0.2);
 }
 
 .stat-label {
