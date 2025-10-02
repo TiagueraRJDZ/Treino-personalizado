@@ -3,7 +3,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function DashboardLayout({
@@ -13,12 +13,70 @@ export default function DashboardLayout({
 }) {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarMinimized, setSidebarMinimized] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
     }
   }, [user, loading, router]);
+
+  // Fechar sidebar ao clicar fora dela em mobile
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const sidebar = document.querySelector('.dashboard-sidebar');
+      const menuBtn = document.querySelector('.mobile-menu-btn');
+      
+      if (sidebarOpen && sidebar && !sidebar.contains(event.target as Node) && 
+          !menuBtn?.contains(event.target as Node)) {
+        setSidebarOpen(false);
+      }
+    };
+
+    if (sidebarOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [sidebarOpen]);
+
+  // Fechar sidebar ao redimensionar para desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Atalho de teclado Ctrl+B para toggle da sidebar
+  useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === 'b') {
+        event.preventDefault();
+        if (window.innerWidth >= 1024) {
+          toggleSidebarMinimize();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeydown);
+    return () => document.removeEventListener('keydown', handleKeydown);
+  }, []);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const toggleSidebarMinimize = () => {
+    setSidebarMinimized(!sidebarMinimized);
+  };
 
   if (loading) {
     return (
@@ -40,7 +98,10 @@ export default function DashboardLayout({
   }
   return (
     <div className="dashboard-app">
-      <aside className="dashboard-sidebar">
+      {/* Overlay para mobile */}
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
+      
+      <aside className={`dashboard-sidebar ${sidebarOpen ? 'sidebar-open' : ''} ${sidebarMinimized ? 'sidebar-minimized' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
             <div className="logo-icon">
@@ -50,12 +111,24 @@ export default function DashboardLayout({
             </div>
             <h1 className="logo-text">Treino Pro</h1>
           </div>
+          <button 
+            className="sidebar-toggle-btn"
+            onClick={toggleSidebarMinimize}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {sidebarMinimized ? (
+                <path d="M9 18l6-6-6-6"/>
+              ) : (
+                <path d="M15 18l-6-6 6-6"/>
+              )}
+            </svg>
+          </button>
         </div>
         
         <nav className="sidebar-nav">
           <ul className="nav-list">
             <li className="nav-item">
-              <Link href="/dashboard" className="nav-link">
+              <Link href="/dashboard" className="nav-link" onClick={() => setSidebarOpen(false)} data-tooltip="Dashboard">
                 <div className="nav-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="3" y="3" width="7" height="7"/>
@@ -68,7 +141,7 @@ export default function DashboardLayout({
               </Link>
             </li>
             <li className="nav-item">
-              <Link href="/dashboard/alunos" className="nav-link">
+              <Link href="/dashboard/alunos" className="nav-link" onClick={() => setSidebarOpen(false)} data-tooltip="Alunos">
                 <div className="nav-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -79,7 +152,7 @@ export default function DashboardLayout({
               </Link>
             </li>
             <li className="nav-item">
-              <Link href="/dashboard/exercicios" className="nav-link">
+              <Link href="/dashboard/exercicios" className="nav-link" onClick={() => setSidebarOpen(false)} data-tooltip="Exercícios">
                 <div className="nav-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M6.5 6.5h11"/>
@@ -90,13 +163,23 @@ export default function DashboardLayout({
                 <span className="nav-text">Exercícios</span>
               </Link>
             </li>
+            <li className="nav-item">
+              <Link href="/dashboard/metas" className="nav-link" onClick={() => setSidebarOpen(false)} data-tooltip="Metas">
+                <div className="nav-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                </div>
+                <span className="nav-text">Metas</span>
+              </Link>
+            </li>
           </ul>
           
           <div className="nav-section">
             <h3 className="nav-section-title">Ferramentas</h3>
             <ul className="nav-list">
               <li className="nav-item">
-                <Link href="/dashboard/relatorios" className="nav-link">
+                <Link href="/dashboard/relatorios" className="nav-link" onClick={() => setSidebarOpen(false)} data-tooltip="Relatórios">
                   <div className="nav-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -110,7 +193,7 @@ export default function DashboardLayout({
                 </Link>
               </li>
               <li className="nav-item">
-                <Link href="/dashboard/configuracoes" className="nav-link">
+                <Link href="/dashboard/configuracoes" className="nav-link" onClick={() => setSidebarOpen(false)} data-tooltip="Configurações">
                   <div className="nav-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <circle cx="12" cy="12" r="3"/>
@@ -148,10 +231,10 @@ export default function DashboardLayout({
         </div>
       </aside>
 
-      <main className="dashboard-main">
+      <main className={`dashboard-main ${sidebarMinimized ? 'main-minimized' : ''}`}>
         <header className="dashboard-header">
           <div className="header-left">
-            <button className="mobile-menu-btn">
+            <button className="mobile-menu-btn" onClick={toggleSidebar}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="3" y1="6" x2="21" y2="6"/>
                 <line x1="3" y1="12" x2="21" y2="12"/>

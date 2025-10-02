@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -16,6 +16,11 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
+
+// Configurar persistência para manter login após reload
+setPersistence(auth, browserLocalPersistence).catch((error) => {
+  console.error('Erro ao configurar persistência:', error);
+});
 
 // Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app);
