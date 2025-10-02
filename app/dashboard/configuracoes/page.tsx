@@ -1,12 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useI18n } from '../../contexts/I18nContext';
 import { updateProfile, updatePassword } from 'firebase/auth';
-import { auth } from '../../../lib/firebase';
+import { auth, db } from '../../../lib/firebase';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 export default function ConfiguracoesPage() {
   const { user, logout } = useAuth();
+  const { t, setLanguage: setI18nLanguage } = useI18n();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -36,6 +39,43 @@ export default function ConfiguracoesPage() {
     newPassword: '',
     confirmPassword: ''
   });
+
+  // Carregar dados do usuário do Firestore
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setProfileData(prev => ({
+              ...prev,
+              phone: userData.phone || '',
+              bio: userData.bio || ''
+            }));
+            
+            // Carregar configurações de idioma e região
+            if (userData.language) {
+              setLanguage(userData.language);
+            }
+            if (userData.region) {
+              setRegion(userData.region);
+            }
+            if (userData.darkMode !== undefined) {
+              setDarkMode(userData.darkMode);
+            }
+            if (userData.notifications) {
+              setNotifications(userData.notifications);
+            }
+          }
+        } catch (error) {
+          console.error('Erro ao carregar dados do usuário:', error);
+        }
+      }
+    };
+
+    loadUserData();
+  }, [user]);
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setProfileData({
@@ -72,9 +112,20 @@ export default function ConfiguracoesPage() {
     setError('');
 
     try {
+      // Atualizar displayName no Firebase Auth
       await updateProfile(user, {
         displayName: profileData.displayName
       });
+
+      // Salvar dados adicionais no Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        displayName: profileData.displayName,
+        email: profileData.email,
+        phone: profileData.phone,
+        bio: profileData.bio,
+        updatedAt: new Date()
+      }, { merge: true });
+
       setMessage('Perfil atualizado com sucesso!');
     } catch (error: any) {
       setError('Erro ao atualizar perfil: ' + error.message);
@@ -117,6 +168,33 @@ export default function ConfiguracoesPage() {
     }
   };
 
+  const handleLanguageRegionUpdate = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    setMessage('');
+    setError('');
+
+    try {
+      // Salvar configurações de idioma e região no Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        language,
+        region,
+        darkMode,
+        notifications
+      }, { merge: true });
+
+      // Atualizar o contexto de internacionalização
+      setI18nLanguage(language);
+
+      setMessage(t('settings.settingsSaved'));
+    } catch (error: any) {
+      setError(t('settings.settingsUpdateError') + ': ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -128,7 +206,7 @@ export default function ConfiguracoesPage() {
   return (
     <div className="dashboard-page">
       <div className="page-header">
-        <h1 className="page-title">Configurações</h1>
+        <h1 className="page-title">{t('settings.title')}</h1>
         <p className="page-subtitle">Gerencie suas informações pessoais e preferências</p>
       </div>
 
@@ -160,8 +238,8 @@ export default function ConfiguracoesPage() {
                 </svg>
               </div>
               <div className="setting-info">
-                <h3 className="setting-title">Modo Escuro</h3>
-                <p className="setting-description">Altere a aparência da interface</p>
+                <h3 className="setting-title">{t('settings.darkMode')}</h3>
+                <p className="setting-description">{t('settings.darkModeDescription')}</p>
               </div>
               <div className="setting-arrow">
                 <svg 
@@ -213,8 +291,8 @@ export default function ConfiguracoesPage() {
                 </svg>
               </div>
               <div className="setting-info">
-                <h3 className="setting-title">Editar Perfil</h3>
-                <p className="setting-description">Atualize suas informações pessoais</p>
+                <h3 className="setting-title">{t('settings.editProfile')}</h3>
+                <p className="setting-description">{t('settings.editProfileDescription')}</p>
               </div>
               <div className="setting-arrow">
                 <svg 
@@ -235,7 +313,7 @@ export default function ConfiguracoesPage() {
               <form onSubmit={handleProfileUpdate} className="settings-form">
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="displayName">Nome de Exibição</label>
+                    <label htmlFor="displayName">{t('auth.displayName')}</label>
                     <input
                       type="text"
                       id="displayName"
@@ -248,7 +326,7 @@ export default function ConfiguracoesPage() {
                   </div>
                   
                   <div className="form-group">
-                    <label htmlFor="phone">Telefone</label>
+                    <label htmlFor="phone">{t('settings.phone')}</label>
                     <input
                       type="tel"
                       id="phone"
@@ -262,7 +340,7 @@ export default function ConfiguracoesPage() {
                 </div>
                 
                 <div className="form-group">
-                  <label htmlFor="email">Email</label>
+                  <label htmlFor="email">{t('auth.email')}</label>
                   <input
                     type="email"
                     id="email"
@@ -274,7 +352,7 @@ export default function ConfiguracoesPage() {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="bio">Bio</label>
+                  <label htmlFor="bio">{t('settings.bio')}</label>
                   <textarea
                     id="bio"
                     name="bio"
@@ -287,7 +365,7 @@ export default function ConfiguracoesPage() {
                 </div>
 
                 <button type="submit" className="btn btn-primary" disabled={loading}>
-                  {loading ? 'Salvando...' : 'Salvar Alterações'}
+                  {loading ? t('settings.saving') : t('settings.saveChanges')}
                 </button>
               </form>
             </div>
@@ -310,8 +388,8 @@ export default function ConfiguracoesPage() {
                 </svg>
               </div>
               <div className="setting-info">
-                <h3 className="setting-title">Notificações</h3>
-                <p className="setting-description">Configure como você recebe notificações</p>
+                <h3 className="setting-title">{t('settings.notifications')}</h3>
+                <p className="setting-description">{t('settings.notificationsDescription')}</p>
               </div>
               <div className="setting-arrow">
                 <svg 
@@ -332,7 +410,7 @@ export default function ConfiguracoesPage() {
               <div className="notification-settings">
                 <div className="notification-item">
                   <div className="notification-info">
-                    <h4>Notificações por Email</h4>
+                    <h4>{t('settings.emailNotifications')}</h4>
                     <p>Receba atualizações importantes por email</p>
                   </div>
                   <div className="toggle-switch">
@@ -350,7 +428,7 @@ export default function ConfiguracoesPage() {
 
                 <div className="notification-item">
                   <div className="notification-info">
-                    <h4>Notificações Push</h4>
+                    <h4>{t('settings.pushNotifications')}</h4>
                     <p>Receba notificações no navegador</p>
                   </div>
                   <div className="toggle-switch">
@@ -368,7 +446,7 @@ export default function ConfiguracoesPage() {
 
                 <div className="notification-item">
                   <div className="notification-info">
-                    <h4>Emails de Marketing</h4>
+                    <h4>{t('settings.marketingNotifications')}</h4>
                     <p>Receba dicas e novidades sobre fitness</p>
                   </div>
                   <div className="toggle-switch">
@@ -406,8 +484,8 @@ export default function ConfiguracoesPage() {
                 </svg>
               </div>
               <div className="setting-info">
-                <h3 className="setting-title">Idioma e Região</h3>
-                <p className="setting-description">Configure seu idioma e localização</p>
+                <h3 className="setting-title">{t('settings.languageAndRegion')}</h3>
+                <p className="setting-description">{t('settings.languageAndRegionDescription')}</p>
               </div>
               <div className="setting-arrow">
                 <svg 
@@ -427,7 +505,7 @@ export default function ConfiguracoesPage() {
             <div className="settings-content">
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="language">Idioma</label>
+                  <label htmlFor="language">{t('settings.language')}</label>
                   <select
                     id="language"
                     value={language}
@@ -441,19 +519,52 @@ export default function ConfiguracoesPage() {
                 </div>
                 
                 <div className="form-group">
-                  <label htmlFor="region">Região</label>
+                  <label htmlFor="region">{t('settings.region')}</label>
                   <select
                     id="region"
                     value={region}
                     onChange={(e) => setRegion(e.target.value)}
                   >
-                    <option value="BR">Brasil</option>
-                    <option value="US">Estados Unidos</option>
-                    <option value="ES">Espanha</option>
-                    <option value="FR">França</option>
-                    <option value="PT">Portugal</option>
+                    <option value="AC">Acre</option>
+                    <option value="AL">Alagoas</option>
+                    <option value="AP">Amapá</option>
+                    <option value="AM">Amazonas</option>
+                    <option value="BA">Bahia</option>
+                    <option value="CE">Ceará</option>
+                    <option value="DF">Distrito Federal</option>
+                    <option value="ES">Espírito Santo</option>
+                    <option value="GO">Goiás</option>
+                    <option value="MA">Maranhão</option>
+                    <option value="MT">Mato Grosso</option>
+                    <option value="MS">Mato Grosso do Sul</option>
+                    <option value="MG">Minas Gerais</option>
+                    <option value="PA">Pará</option>
+                    <option value="PB">Paraíba</option>
+                    <option value="PR">Paraná</option>
+                    <option value="PE">Pernambuco</option>
+                    <option value="PI">Piauí</option>
+                    <option value="RJ">Rio de Janeiro</option>
+                    <option value="RN">Rio Grande do Norte</option>
+                    <option value="RS">Rio Grande do Sul</option>
+                    <option value="RO">Rondônia</option>
+                    <option value="RR">Roraima</option>
+                    <option value="SC">Santa Catarina</option>
+                    <option value="SP">São Paulo</option>
+                    <option value="SE">Sergipe</option>
+                    <option value="TO">Tocantins</option>
                   </select>
                 </div>
+              </div>
+              
+              <div className="form-actions">
+                <button 
+                  type="button" 
+                  className="save-btn"
+                  onClick={handleLanguageRegionUpdate}
+                  disabled={loading}
+                >
+                  {loading ? t('settings.saving') : t('settings.saveSettings')}
+                </button>
               </div>
             </div>
           )}
@@ -475,8 +586,8 @@ export default function ConfiguracoesPage() {
                 </svg>
               </div>
               <div className="setting-info">
-                <h3 className="setting-title">Alterar Senha</h3>
-                <p className="setting-description">Mantenha sua conta segura</p>
+                <h3 className="setting-title">{t('settings.changePassword')}</h3>
+                <p className="setting-description">{t('settings.changePasswordDescription')}</p>
               </div>
               <div className="setting-arrow">
                 <svg 
@@ -496,7 +607,7 @@ export default function ConfiguracoesPage() {
             <div className="settings-content">
               <form onSubmit={handlePasswordUpdate} className="settings-form">
                 <div className="form-group">
-                  <label htmlFor="newPassword">Nova Senha</label>
+                  <label htmlFor="newPassword">{t('settings.newPassword')}</label>
                   <input
                     type="password"
                     id="newPassword"
@@ -510,7 +621,7 @@ export default function ConfiguracoesPage() {
                 </div>
                 
                 <div className="form-group">
-                  <label htmlFor="confirmPassword">Confirmar Nova Senha</label>
+                  <label htmlFor="confirmPassword">{t('settings.confirmNewPassword')}</label>
                   <input
                     type="password"
                     id="confirmPassword"
@@ -547,8 +658,8 @@ export default function ConfiguracoesPage() {
                 </svg>
               </div>
               <div className="setting-info">
-                <h3 className="setting-title">Configurações de Conta</h3>
-                <p className="setting-description">Opções da sua conta</p>
+                <h3 className="setting-title">{t('settings.account')}</h3>
+                <p className="setting-description">{t('settings.accountDescription')}</p>
               </div>
               <div className="setting-arrow">
                 <svg 
