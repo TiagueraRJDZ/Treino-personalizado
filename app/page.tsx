@@ -1,7 +1,60 @@
+'use client';
+
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
+import { useAuth } from './contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
+  const { signIn } = useAuth();
+  const router = useRouter();
+  const [quickLoginData, setQuickLoginData] = useState({
+    email: '',
+    password: ''
+  });
+  const [quickLoginLoading, setQuickLoginLoading] = useState(false);
+  const [quickLoginError, setQuickLoginError] = useState('');
+
+  const handleQuickLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuickLoginData({
+      ...quickLoginData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleQuickLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!quickLoginData.email || !quickLoginData.password) {
+      setQuickLoginError('Por favor, preencha todos os campos');
+      return;
+    }
+
+    setQuickLoginLoading(true);
+    setQuickLoginError('');
+
+    try {
+      await signIn(quickLoginData.email, quickLoginData.password);
+      // Redireciona diretamente para o dashboard
+      router.push('/dashboard');
+    } catch (error: any) {
+      console.error('Erro no login rápido:', error);
+      if (error.code === 'auth/user-not-found') {
+        setQuickLoginError('Usuário não encontrado');
+      } else if (error.code === 'auth/wrong-password') {
+        setQuickLoginError('Senha incorreta');
+      } else if (error.code === 'auth/invalid-email') {
+        setQuickLoginError('Email inválido');
+      } else if (error.code === 'auth/invalid-credential') {
+        setQuickLoginError('Email ou senha incorretos');
+      } else {
+        setQuickLoginError('Erro ao fazer login. Tente novamente.');
+      }
+    } finally {
+      setQuickLoginLoading(false);
+    }
+  };
+
   return (
     <div className="homepage">
       {/* Header */}
@@ -165,13 +218,42 @@ export default function HomePage() {
                 <h3>Já tem uma conta?</h3>
                 <p>Entre rapidamente para acessar seus treinos</p>
               </div>
-              <form className="quick-login-form" action="/login" method="get">
+              
+              {quickLoginError && (
+                <div className="error-message-quick">
+                  {quickLoginError}
+                </div>
+              )}
+              
+              <form className="quick-login-form" onSubmit={handleQuickLoginSubmit}>
                 <div className="form-group-inline">
-                  <input type="email" placeholder="seu@email.com" className="quick-input" name="email" />
-                  <input type="password" placeholder="Sua senha" className="quick-input" name="password" />
-                  <Link href="/login" className="btn btn-primary">
-                    Entrar
-                  </Link>
+                  <input 
+                    type="email" 
+                    placeholder="seu@email.com" 
+                    className="quick-input" 
+                    name="email"
+                    value={quickLoginData.email}
+                    onChange={handleQuickLoginChange}
+                    disabled={quickLoginLoading}
+                    required
+                  />
+                  <input 
+                    type="password" 
+                    placeholder="Sua senha" 
+                    className="quick-input" 
+                    name="password"
+                    value={quickLoginData.password}
+                    onChange={handleQuickLoginChange}
+                    disabled={quickLoginLoading}
+                    required
+                  />
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary"
+                    disabled={quickLoginLoading}
+                  >
+                    {quickLoginLoading ? 'Entrando...' : 'Entrar'}
+                  </button>
                 </div>
               </form>
               <div className="login-links">

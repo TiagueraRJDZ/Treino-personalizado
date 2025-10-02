@@ -1570,6 +1570,19 @@ body {
   margin-bottom: 1.5rem;
 }
 
+.error-message-quick {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .form-group-inline {
   display: flex;
   gap: 1rem;
@@ -1598,6 +1611,24 @@ body {
   min-width: 120px;
   height: auto;
   align-self: stretch;
+}
+
+.form-group-inline button.btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.form-group-inline button.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .login-links {
