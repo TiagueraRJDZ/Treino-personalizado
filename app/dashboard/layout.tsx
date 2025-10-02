@@ -20,22 +20,6 @@ export default function DashboardLayout({
     }
   }, [user, loading, router]);
 
-  // Adiciona proteção extra contra navegação pelo histórico
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden' && user) {
-        // Quando a página fica oculta (usuário navega para outra página), desloga
-        logout();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [user, logout]);
-
   if (loading) {
     return (
       <div className="loading-screen">

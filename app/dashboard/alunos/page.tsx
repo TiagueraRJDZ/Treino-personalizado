@@ -33,7 +33,7 @@ export default function AlunosPage() {
           <p className="page-subtitle">Gerencie seus alunos e acompanhe o progresso</p>
         </div>
         <button 
-          className="action-btn primary"
+          className="action-btn primary compact"
           onClick={() => setNovoAlunoModalOpen(true)}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
