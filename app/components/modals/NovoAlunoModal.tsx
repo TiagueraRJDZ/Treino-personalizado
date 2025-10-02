@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { useState, useEffect } from 'react';
+import { collection, addDoc, doc, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Modal, FormField, Input, Select, Button } from '@/app/components/ui/Modal';
 
@@ -9,6 +9,7 @@ interface NovoAlunoModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  alunoParaEditar?: any; // Aluno existente para edição
 }
 
 interface FormData {
@@ -29,10 +30,33 @@ const initialFormData: FormData = {
   status: 'ativo'
 };
 
-export function NovoAlunoModal({ isOpen, onClose, onSuccess }: NovoAlunoModalProps) {
+export function NovoAlunoModal({ isOpen, onClose, onSuccess, alunoParaEditar }: NovoAlunoModalProps) {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [loading, setLoading] = useState(false);
+
+  const isEditing = !!alunoParaEditar;
+
+  // Preencher formulário quando for edição
+  useEffect(() => {
+    if (alunoParaEditar) {
+      const dataFormatada = alunoParaEditar.dataNascimento instanceof Date 
+        ? alunoParaEditar.dataNascimento.toISOString().split('T')[0]
+        : new Date(alunoParaEditar.dataNascimento).toISOString().split('T')[0];
+
+      setFormData({
+        nome: alunoParaEditar.nome || '',
+        email: alunoParaEditar.email || '',
+        telefone: alunoParaEditar.telefone || '',
+        dataNascimento: dataFormatada,
+        objetivo: alunoParaEditar.objetivo || '',
+        status: alunoParaEditar.status || 'ativo'
+      });
+    } else {
+      setFormData(initialFormData);
+    }
+    setErrors({});
+  }, [alunoParaEditar, isOpen]);
 
   const handleInputChange = (field: keyof FormData) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -90,12 +114,23 @@ export function NovoAlunoModal({ isOpen, onClose, onSuccess }: NovoAlunoModalPro
         dataNascimento: Timestamp.fromDate(new Date(formData.dataNascimento)),
         objetivo: formData.objetivo.trim(),
         status: formData.status,
-        treinos: [],
-        dataCriacao: Timestamp.now(),
         dataAtualizacao: Timestamp.now()
       };
 
-      await addDoc(collection(db, 'alunos'), alunoData);
+      if (isEditing) {
+        // Atualizar aluno existente
+        await updateDoc(doc(db, 'alunos', alunoParaEditar.id), alunoData);
+        alert('Aluno atualizado com sucesso!');
+      } else {
+        // Criar novo aluno
+        const novoAlunoData = {
+          ...alunoData,
+          treinos: [],
+          dataCriacao: Timestamp.now()
+        };
+        await addDoc(collection(db, 'alunos'), novoAlunoData);
+        alert('Aluno cadastrado com sucesso!');
+      }
 
       // Reset form
       setFormData(initialFormData);
@@ -107,12 +142,9 @@ export function NovoAlunoModal({ isOpen, onClose, onSuccess }: NovoAlunoModalPro
       // Fechar modal
       onClose();
 
-      // Mostrar mensagem de sucesso (opcional)
-      alert('Aluno cadastrado com sucesso!');
-
     } catch (error) {
-      console.error('Erro ao cadastrar aluno:', error);
-      alert('Erro ao cadastrar aluno. Tente novamente.');
+      console.error(`Erro ao ${isEditing ? 'atualizar' : 'cadastrar'} aluno:`, error);
+      alert(`Erro ao ${isEditing ? 'atualizar' : 'cadastrar'} aluno. Tente novamente.`);
     } finally {
       setLoading(false);
     }
@@ -130,7 +162,7 @@ export function NovoAlunoModal({ isOpen, onClose, onSuccess }: NovoAlunoModalPro
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title="Cadastrar Novo Aluno"
+      title={isEditing ? "Editar Aluno" : "Cadastrar Novo Aluno"}
       size="md"
     >
       <form onSubmit={handleSubmit}>
@@ -225,7 +257,10 @@ export function NovoAlunoModal({ isOpen, onClose, onSuccess }: NovoAlunoModalPro
             loading={loading}
             disabled={loading}
           >
-            {loading ? 'Cadastrando...' : 'Cadastrar Aluno'}
+            {loading 
+              ? (isEditing ? 'Atualizando...' : 'Cadastrando...') 
+              : (isEditing ? 'Atualizar Aluno' : 'Cadastrar Aluno')
+            }
           </Button>
         </div>
       </form>

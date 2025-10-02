@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { doc, deleteDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { useAlunos } from '@/hooks/useFirestore';
 import { NovoAlunoModal } from '@/app/components/modals/NovoAlunoModal';
 import { LoadingCard, ErrorCard } from '@/app/components/ui/Loading';
@@ -8,6 +10,9 @@ import { LoadingCard, ErrorCard } from '@/app/components/ui/Loading';
 export default function AlunosPage() {
   const { alunos, loading, error } = useAlunos();
   const [novoAlunoModalOpen, setNovoAlunoModalOpen] = useState(false);
+  const [editAlunoModalOpen, setEditAlunoModalOpen] = useState(false);
+  const [selectedAluno, setSelectedAluno] = useState<any>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const formatarDataNascimento = (data: Date) => {
     return data.toLocaleDateString('pt-BR');
@@ -23,6 +28,26 @@ export default function AlunosPage() {
       return idade - 1;
     }
     return idade;
+  };
+
+  const handleDeleteAluno = async (alunoId: string, alunoNome: string) => {
+    if (window.confirm(`Tem certeza que deseja excluir o aluno "${alunoNome}"? Esta ação não pode ser desfeita.`)) {
+      try {
+        setDeletingId(alunoId);
+        await deleteDoc(doc(db, 'alunos', alunoId));
+        console.log('Aluno deletado com sucesso!');
+      } catch (error) {
+        console.error('Erro ao deletar aluno:', error);
+        alert('Erro ao deletar aluno. Tente novamente.');
+      } finally {
+        setDeletingId(null);
+      }
+    }
+  };
+
+  const handleEditAluno = (aluno: any) => {
+    setSelectedAluno(aluno);
+    setEditAlunoModalOpen(true);
   };
 
   return (
@@ -102,17 +127,33 @@ export default function AlunosPage() {
                     </td>
                     <td>
                       <div className="table-actions">
-                        <button className="action-icon" title="Editar">
+                        <button 
+                          className="action-icon" 
+                          title="Editar"
+                          onClick={() => handleEditAluno(aluno)}
+                        >
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                           </svg>
                         </button>
-                        <button className="action-icon danger" title="Excluir">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="3,6 5,6 21,6"/>
-                            <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
-                          </svg>
+                        <button 
+                          className="action-icon danger" 
+                          title="Excluir"
+                          onClick={() => handleDeleteAluno(aluno.id, aluno.nome)}
+                          disabled={deletingId === aluno.id}
+                        >
+                          {deletingId === aluno.id ? (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin">
+                              <circle cx="12" cy="12" r="10"/>
+                              <path d="M8 12l2 2 4-4"/>
+                            </svg>
+                          ) : (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <polyline points="3,6 5,6 21,6"/>
+                              <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
+                            </svg>
+                          )}
                         </button>
                       </div>
                     </td>
@@ -124,7 +165,7 @@ export default function AlunosPage() {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Modal Novo Aluno */}
       <NovoAlunoModal
         isOpen={novoAlunoModalOpen}
         onClose={() => setNovoAlunoModalOpen(false)}
@@ -132,6 +173,21 @@ export default function AlunosPage() {
           // O hook useAlunos já irá atualizar automaticamente devido ao onSnapshot
           console.log('Aluno adicionado com sucesso!');
         }}
+      />
+
+      {/* Modal Editar Aluno */}
+      <NovoAlunoModal
+        isOpen={editAlunoModalOpen}
+        onClose={() => {
+          setEditAlunoModalOpen(false);
+          setSelectedAluno(null);
+        }}
+        onSuccess={() => {
+          console.log('Aluno editado com sucesso!');
+          setEditAlunoModalOpen(false);
+          setSelectedAluno(null);
+        }}
+        alunoParaEditar={selectedAluno}
       />
     </div>
   );

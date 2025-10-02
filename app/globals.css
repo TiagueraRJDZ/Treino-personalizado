@@ -185,6 +185,8 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  min-height: 0; /* Força o flex container a permitir scroll */
+  overflow: hidden; /* Evita scroll duplo */
 }
 
 .dashboard-header {
@@ -223,13 +225,19 @@ body {
 .dashboard-content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 2rem;
+  padding-bottom: 4rem; /* Espaço extra no final para garantir scroll completo */
+  min-height: 0; /* Força o flex container a permitir scroll */
+  background-color: var(--color-background);
+  transition: background-color 0.3s ease;
 }
 
 .dashboard-page {
   max-width: 1480px;
   margin: 0 auto;
   padding: 0 1rem;
+  padding-bottom: 3rem; /* Espaço extra no final */
 }
 
 .page-header {
@@ -2879,6 +2887,86 @@ body {
     font-size: 0.875rem;
   }
   
+/* ===== SCROLLBARS PERSONALIZADAS ===== */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-muted);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 6px;
+  border: 2px solid var(--color-muted);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+}
+
+/* Para Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) var(--color-muted);
+}
+
+/* Força barras de rolagem sempre visíveis no dashboard */
+.dashboard-content {
+  scrollbar-gutter: stable;
+}
+
+/* Suporte para monitores verticais */
+@media (orientation: portrait) and (min-height: 1000px) {
+  .dashboard-content {
+    overflow-y: scroll !important; /* Força a barra de rolagem a aparecer */
+    padding-bottom: 6rem; /* Mais espaço para monitores verticais */
+  }
+  
+  ::-webkit-scrollbar {
+    width: 14px; /* Barra um pouco mais larga para telas verticais */
+  }
+  
+  .dashboard-page {
+    min-height: calc(100vh - 4rem); /* Garante altura mínima para ativar scroll */
+    padding-bottom: 5rem; /* Espaço extra para monitores verticais */
+  }
+}
+
+/* Espaço extra para listas e tabelas */
+.dashboard-card:last-child,
+.alunos-table:last-child,
+.workout-list:last-child {
+  margin-bottom: 2rem;
+}
+
+/* Animação de loading */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Botão desabilitado */
+.action-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-icon:disabled:hover {
+  background-color: transparent;
+  transform: none;
+}
   .email-cell,
   .objective-cell {
     max-width: 120px;
