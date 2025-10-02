@@ -92,10 +92,15 @@ export default function LoginPage() {
             <Link href="/" className="brand-logo">
               <div className="logo-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  <path d="M12 2C10.9 2 10 2.9 10 4C10 5.1 10.9 6 12 6C13.1 6 14 5.1 14 4C14 2.9 13.1 2 12 2Z"/>
+                  <path d="M21 9V7L19 8L17.5 7C17 6.5 16 7 16 7.5S16.3 8 16.5 8L18 9L19 10L21 9Z"/>
+                  <path d="M3 9L5 10L6 9L7.5 8C7.7 8 8 7.5 8 7.5S7 6.5 6.5 7L5 8L3 7V9Z"/>
+                  <path d="M9 7.5V22H15V7.5C15 7.5 13.5 8 12 8S9 7.5 9 7.5Z"/>
+                  <circle cx="6" cy="10.5" r="2"/>
+                  <circle cx="18" cy="10.5" r="2"/>
                 </svg>
               </div>
-              <span className="logo-text">Treino Pro</span>
+              <span className="logo-text">Pro Training</span>
             </Link>
             
             <h1 className="brand-title">

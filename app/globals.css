@@ -68,8 +68,8 @@ body {
 }
 
 .logo-icon {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 48px;
+  height: 48px;
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
   border-radius: var(--radius-lg);
   display: flex;
@@ -79,8 +79,8 @@ body {
 }
 
 .logo-icon svg {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 28px;
+  height: 28px;
 }
 
 .logo-text {
@@ -121,8 +121,9 @@ body {
 }
 
 .sidebar-toggle-btn svg {
-  width: 1rem;
-  height: 1rem;
+  width: 20px;
+  height: 20px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
 .sidebar-nav {
@@ -164,8 +165,8 @@ body {
 }
 
 .nav-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 20px;
+  height: 20px;
   color: var(--color-gray-600);
   display: flex;
   align-items: center;
@@ -173,10 +174,11 @@ body {
 }
 
 .nav-icon svg {
-  width: 100%;
-  height: 100%;
+  width: 20px;
+  height: 20px;
   stroke: currentColor;
   fill: none;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
 .nav-text {
@@ -285,6 +287,7 @@ body {
 .sidebar-minimized .user-role {
   opacity: 0;
   visibility: hidden;
+  display: none; /* retira do fluxo para não reservar espaço/gap */
 }
 
 .sidebar-minimized .sidebar-header {
@@ -297,17 +300,21 @@ body {
 }
 
 .sidebar-minimized .nav-link {
-  padding: 0.5rem;
+  padding: 0; /* evita aumentar a caixa e deslocar o ícone */
   justify-content: center;
   position: relative;
   color: var(--color-gray-600) !important;
   display: flex;
   align-items: center;
+  gap: 0; /* sem gap entre ícone e texto (texto está display:none) */
   margin: 0;
   border-radius: var(--radius);
   transition: all 0.2s ease;
   width: 2.25rem;
   height: 2.25rem;
+  /* Centraliza o link dentro do item e lista */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .sidebar-minimized .nav-link:hover {
@@ -320,8 +327,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   margin: 0;
 }
 
@@ -329,9 +336,12 @@ body {
   stroke: var(--color-gray-600) !important;
   fill: none !important;
   color: var(--color-gray-600) !important;
-  width: 18px !important;
-  height: 18px !important;
+  width: 20px !important;
+  height: 20px !important;
   display: block;
+  margin-left: auto;
+  margin-right: auto;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1)) !important;
 }
 
 .sidebar-minimized .nav-link:hover {
@@ -349,7 +359,8 @@ body {
 }
 
 .sidebar-minimized .nav-section {
-  padding: 0 0.75rem;
+  /* Remove padding lateral para centralizar perfeitamente os ícones */
+  padding: 0;
   margin-top: 1.5rem;
 }
 
@@ -358,8 +369,10 @@ body {
   flex-direction: column;
   gap: 0.25rem;
   margin: 0;
-  padding: 0 0.75rem;
-  align-items: stretch;
+  /* Sem padding lateral; centralização via align-items */
+  padding: 0;
+  align-items: center;
+  width: 100%;
 }
 
 .sidebar-minimized .nav-item {
@@ -367,18 +380,23 @@ body {
   list-style: none;
   display: flex;
   justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 .sidebar-minimized .sidebar-nav {
   padding: 0.5rem 0;
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .sidebar-minimized .sidebar-nav > .nav-list {
-  padding: 0 0.75rem;
+  /* Remover padding lateral e centralizar */
+  padding: 0;
   margin-bottom: 0.5rem;
-  align-items: stretch;
+  align-items: center;
+  width: 100%;
 }
 
 .sidebar-minimized .sidebar-footer {
@@ -410,7 +428,7 @@ body {
   margin-left: 0;
   width: 2.25rem;
   height: 2.25rem;
-  padding: 0.5rem;
+  padding: 0; /* mantém a mesma caixa quadrada dos links */
 }
 
 /* Tooltips para estado minimizado */
@@ -474,8 +492,9 @@ body {
 .sidebar-minimized .nav-icon svg {
   stroke: var(--color-gray-600) !important;
   fill: none !important;
-  width: 1.25rem !important;
-  height: 1.25rem !important;
+  width: 20px !important;
+  height: 20px !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1)) !important;
 }
 
 .sidebar-minimized .nav-link:hover .nav-icon svg {
@@ -489,8 +508,9 @@ body {
 .sidebar-minimized .logout-btn svg {
   stroke: var(--color-gray-600) !important;
   fill: none !important;
-  width: 18px !important;
-  height: 18px !important;
+  width: 20px !important;
+  height: 20px !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1)) !important;
 }
 
 .sidebar-minimized .logout-btn:hover {
@@ -538,6 +558,12 @@ body {
   transition: all 0.2s ease;
 }
 
+.mobile-menu-btn svg {
+  width: 20px;
+  height: 20px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
 .mobile-menu-btn:hover {
   background-color: var(--color-gray-100);
   color: var(--color-gray-800);
@@ -565,6 +591,12 @@ body {
   color: var(--color-gray-600);
   cursor: pointer;
   border-radius: var(--radius);
+}
+
+.header-btn svg {
+  width: 20px;
+  height: 20px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
 .header-btn:hover {
@@ -1243,8 +1275,9 @@ body {
   }
   
   .mobile-menu-btn svg {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 20px;
+    height: 20px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
   }
   
   .dashboard-grid {
@@ -1704,8 +1737,8 @@ body {
 }
 
 .logo-icon {
-  width: 32px;
-  height: 32px;
+  width: 48px;
+  height: 48px;
   background: var(--color-primary);
   border-radius: 8px;
   display: flex;
@@ -1715,8 +1748,8 @@ body {
 }
 
 .logo-icon svg {
-  width: 18px;
-  height: 18px;
+  width: 28px;
+  height: 28px;
 }
 
 .logo-text {
@@ -2477,8 +2510,8 @@ body {
 }
 
 .brand-logo .logo-icon svg {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
 }
 
 .brand-logo .logo-text {
@@ -2770,8 +2803,9 @@ body {
 }
 
 .logout-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
 .user-info {
