@@ -6,13 +6,19 @@ import { useI18n } from '../../contexts/I18nContext';
 import { updateProfile, updatePassword } from 'firebase/auth';
 import { auth, db } from '../../../lib/firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
+import ToastNotification from '../../components/ToastNotification';
 
 export default function ConfiguracoesPage() {
   const { user, logout } = useAuth();
   const { t, setLanguage: setI18nLanguage } = useI18n();
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  
+  // Estados para o sistema de toast notifications
+  const [toast, setToast] = useState({
+    message: '',
+    type: 'info' as 'success' | 'error' | 'info',
+    isVisible: false
+  });
 
   // Estados para configurações
   const [darkMode, setDarkMode] = useState(false);
@@ -39,6 +45,20 @@ export default function ConfiguracoesPage() {
     newPassword: '',
     confirmPassword: ''
   });
+
+  // Função para mostrar toast notifications
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToast({
+      message,
+      type,
+      isVisible: true
+    });
+  };
+
+  // Função para fechar toast
+  const closeToast = () => {
+    setToast(prev => ({ ...prev, isVisible: false }));
+  };
 
   // Carregar dados do usuário do Firestore
   useEffect(() => {
@@ -108,8 +128,6 @@ export default function ConfiguracoesPage() {
     if (!user) return;
 
     setLoading(true);
-    setMessage('');
-    setError('');
 
     try {
       // Atualizar displayName no Firebase Auth
@@ -126,9 +144,9 @@ export default function ConfiguracoesPage() {
         updatedAt: new Date()
       }, { merge: true });
 
-      setMessage('Perfil atualizado com sucesso!');
+      showToast(t('settings.profileUpdated'), 'success');
     } catch (error: any) {
-      setError('Erro ao atualizar perfil: ' + error.message);
+      showToast(t('settings.profileUpdateError') + ': ' + error.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -140,29 +158,27 @@ export default function ConfiguracoesPage() {
     if (!user) return;
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError('As senhas não coincidem');
+      showToast(t('settings.passwordMismatch'), 'error');
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      setError('A nova senha deve ter pelo menos 6 caracteres');
+      showToast(t('settings.passwordTooShort'), 'error');
       return;
     }
 
     setLoading(true);
-    setMessage('');
-    setError('');
 
     try {
       await updatePassword(user, passwordData.newPassword);
-      setMessage('Senha atualizada com sucesso!');
+      showToast(t('settings.passwordUpdated'), 'success');
       setPasswordData({
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       });
     } catch (error: any) {
-      setError('Erro ao atualizar senha: ' + error.message);
+      showToast(t('settings.passwordUpdateError') + ': ' + error.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -172,8 +188,6 @@ export default function ConfiguracoesPage() {
     if (!user) return;
 
     setLoading(true);
-    setMessage('');
-    setError('');
 
     try {
       // Salvar configurações de idioma e região no Firestore
@@ -187,9 +201,9 @@ export default function ConfiguracoesPage() {
       // Atualizar o contexto de internacionalização
       setI18nLanguage(language);
 
-      setMessage(t('settings.settingsSaved'));
+      showToast(t('settings.settingsSaved'), 'success');
     } catch (error: any) {
-      setError(t('settings.settingsUpdateError') + ': ' + error.message);
+      showToast(t('settings.settingsUpdateError') + ': ' + error.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -199,7 +213,7 @@ export default function ConfiguracoesPage() {
     try {
       await logout();
     } catch (error: any) {
-      setError('Erro ao fazer logout: ' + error.message);
+      showToast(t('settings.logoutError') + ': ' + error.message, 'error');
     }
   };
 
@@ -211,18 +225,6 @@ export default function ConfiguracoesPage() {
       </div>
 
       <div className="settings-list">
-        {/* Mensagens de feedback */}
-        {message && (
-          <div className="success-message settings-message">
-            {message}
-          </div>
-        )}
-        {error && (
-          <div className="error-message settings-message">
-            {error}
-          </div>
-        )}
-
         {/* 1. Modo Escuro */}
         <div className="settings-row">
           <button 
@@ -690,6 +692,15 @@ export default function ConfiguracoesPage() {
           )}
         </div>
       </div>
+
+      {/* Toast Notification */}
+      <ToastNotification
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={closeToast}
+        duration={5000}
+      />
     </div>
   );
 }
